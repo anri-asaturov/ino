@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+optimisticRepeatInstall: false
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  msgpackr-extract: true
+  prisma: true
+
+minimumReleaseAge: 0

@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "expo.vscode-expo-tools",
+    "mk12.better-git-line-blame",
+    "mikestead.dotenv",
+    "ibm.output-colorizer",
+    "esbenp.prettier-vscode",
+    "prisma.prisma",
+    "stylelint.vscode-stylelint",
+    "simonsiefke.svg-preview",
+    "bradlc.vscode-tailwindcss"
+  ]
+}

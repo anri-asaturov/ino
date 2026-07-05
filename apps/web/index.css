@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+html {
+  background: #f8fafc;
+  color: #020617;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}

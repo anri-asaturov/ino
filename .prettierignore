@@ -1,0 +1,8 @@
+pnpm-lock.yaml
+uniwind-types.d.ts
+*.generated.ts
+mobile/targets/**/Assets.xcassets/**/Contents.json
+mobile/app.json
+*.adb
+*.aab
+*.ipa

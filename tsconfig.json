@@ -1,0 +1,18 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "apps/shared"
+    },
+    {
+      "path": "apps/client-shared"
+    },
+    {
+      "path": "apps/backend"
+    },
+    {
+      "path": "apps/web"
+    }
+  ],
+  "compilerOptions": {}
+}

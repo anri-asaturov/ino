@@ -1,0 +1,8 @@
+# Local build artifacts
+*.ipa
+*.aab
+
+# Expo generated types
+expo-env.d.ts
+
+.env.local

@@ -1,0 +1,51 @@
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.pnpm-store
+dist
+dist-ssr
+build
+*.local
+!.env.local.example
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.env
+generated
+tsconfig.tsbuildinfo
+
+.expo/
+
+# Mobile/Expo
+web-build/
+expo-env.d.ts
+.metro-health-check*
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+mobile/ios/
+mobile/android/
+mobile/credentials.json
+bugreport*.zip
+
+# Claude
+.claude/settings.local.json
+apps/backend/coverage/

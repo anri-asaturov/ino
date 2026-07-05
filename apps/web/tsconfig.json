@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "../shared" },
+    { "path": "../backend" }
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@web/*": ["./src/*"]
+    }
+  }
+}

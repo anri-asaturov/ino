@@ -1,0 +1,37 @@
+{
+  "name": "ino",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "web": "pnpm --filter @ino/web",
+    "back": "pnpm --filter @ino/backend",
+    "format": "prettier --write --list-different .",
+    "prisma": "pnpm back exec prisma",
+    "deps": "pnpm up -i -r --latest",
+    "dev": "concurrently -n back,web -c cyan,magenta \"pnpm back dev\" \"pnpm web dev\"",
+    "build": "pnpm back build && pnpm web build",
+    "test": "pnpm test:prepare && pnpm test:typecheck:prepared && pnpm test:unit:prepared",
+    "test:prepare": "pnpm prisma generate",
+    "test:typecheck": "pnpm test:typecheck:prepared",
+    "test:typecheck:prepared": "pnpm back exec tsc -p tsconfig.web-types.json && pnpm web exec tsc -p tsconfig.app.json && pnpm web exec tsc -p tsconfig.node.json",
+    "test:unit": "pnpm test:unit:prepared",
+    "test:unit:prepared": "pnpm back test --run && pnpm web test --run",
+    "test:build-all": "export VITE_INO_ENV=local && pnpm build"
+  },
+  "packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b",
+  "dependencies": {
+    "concurrently": "^10.0.3",
+    "prettier": "^3.9.4",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "tsx": "^4.23.0",
+    "vitest": "^4.1.9"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.0",
+    "typescript": "^6.0.3"
+  }
+}

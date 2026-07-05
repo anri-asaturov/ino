@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Ino",
+    "slug": "ino",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "ino",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {},
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

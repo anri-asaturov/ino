@@ -1,0 +1,27 @@
+//  Model definition sorting system
+//
+// 1. Plain columns
+// 2. Foreign key columns
+// 3. Relations
+// 4. Created at, Updated at
+// 5. Indexes
+//
+// Add empty lines between each section
+
+generator client {
+    provider = "prisma-client"
+    output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model User {
+    /// prefix gusr_
+    id        String   @id
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("users")
+}

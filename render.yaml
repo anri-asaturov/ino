@@ -1,0 +1,45 @@
+previews:
+  generation: 'off'
+
+services:
+  - name: ino-web
+    type: web
+    runtime: static
+    buildCommand: corepack enable && pnpm i --frozen-lockfile && VITE_INO_ENV=production pnpm web build
+    staticPublishPath: ./apps/web/dist
+    autoDeployTrigger: commit
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://ino-api.onrender.com/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_INO_ENV
+        value: production
+
+  - name: ino-api
+    type: web
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm i --frozen-lockfile && pnpm back build
+    startCommand: node ./apps/backend/dist/src/index.js
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: INO_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://ino-web.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ino-db
+          property: connectionString
+
+databases:
+  - name: ino-db
+    databaseName: ino
+    plan: free
+    postgresMajorVersion: '18'
