@@ -31,3 +31,9 @@ We use 3 environments:
 - production
 
 `INO_ENV` controls the backend environment. `VITE_INO_ENV` controls the web environment.
+
+## Open questions/decisions/assumptions
+
+- The task description mentions mock api can return no results, while requires to prefill data on start. Theoretically we could call import several times and get 0 results on all calls.
+
+- It's not specified what to do in case of patient + date + biomarker conflict or if it's possible. The decision was made to overwrite biomarker values with latest data, but to aggregate biomarkers for the same day.

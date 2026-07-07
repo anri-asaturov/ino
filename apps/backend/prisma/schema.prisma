@@ -17,11 +17,47 @@ datasource db {
     provider = "postgresql"
 }
 
-model User {
-    /// prefix gusr_
-    id        String   @id
+model Patient {
+    id String @id
+
+    birthdate String @db.VarChar(10)
+    gender    Int
+    ethnicity Int
+
+    labResults LabResult[]
+
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
 
-    @@map("users")
+    @@map("patients")
+}
+
+model LabResult {
+    id String @id @default(cuid())
+
+    date               String  @db.VarChar(10)
+    creatine           Decimal @db.Decimal(10, 2)
+    chloride           Decimal @db.Decimal(10, 2)
+    fastingGlucose     Decimal @map("fasting_glucose") @db.Decimal(10, 2)
+    potassium          Decimal @db.Decimal(10, 2)
+    sodium             Decimal @db.Decimal(10, 2)
+    totalCalcium       Decimal @map("total_calcium") @db.Decimal(10, 2)
+    totalProtein       Decimal @map("total_protein") @db.Decimal(10, 2)
+    creatineUnit       String  @map("creatine_unit")
+    chlorideUnit       String  @map("chloride_unit")
+    fastingGlucoseUnit String  @map("fasting_glucose_unit")
+    potassiumUnit      String  @map("potassium_unit")
+    sodiumUnit         String  @map("sodium_unit")
+    totalCalciumUnit   String  @map("total_calcium_unit")
+    totalProteinUnit   String  @map("total_protein_unit")
+
+    patientId String @map("patient_id")
+
+    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@unique([patientId, date])
+    @@map("lab_results")
 }
