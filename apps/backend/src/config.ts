@@ -24,4 +24,6 @@ const env = envSchema.parse(process.env);
 export default env;
 
 export const CORS_ORIGINS = env.INO_ENV === 'production' ? [env.FRONTEND_URL] : true;
+export const LAB_RESULTS_INITIAL_PATIENTS = 10;
+export const LAB_RESULTS_IMPORT_CONCURRENCY = 3;
 export const MOCK_API_LAB_RESULTS_URL = 'https://mockapi-furw4tenlq-ez.a.run.app/data';

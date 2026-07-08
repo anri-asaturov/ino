@@ -16,6 +16,8 @@ const fetchMock = vi.fn();
 const sleepMock = vi.hoisted(() => vi.fn());
 
 vi.mock('../config.js', () => ({
+  LAB_RESULTS_IMPORT_CONCURRENCY: 3,
+  LAB_RESULTS_INITIAL_PATIENTS: 10,
   MOCK_API_LAB_RESULTS_URL: 'https://mock-api.test/data'
 }));
 

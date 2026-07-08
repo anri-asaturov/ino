@@ -1,3 +1,4 @@
+import { LAB_RESULTS_IMPORT_CONCURRENCY, LAB_RESULTS_INITIAL_PATIENTS } from '../config.js';
 import { db } from '../db.js';
 import { log } from '../helpers/logger.js';
 import { runConcurrently } from '../util/runConcurrently.js';
@@ -19,7 +20,7 @@ const MAX_ATTEMPTS = 5;
  */
 export async function importLabResults(
   patients: number,
-  concurrency = 1
+  concurrency = LAB_RESULTS_IMPORT_CONCURRENCY
 ): Promise<{ imported: number; failed: number }> {
   const ret = { imported: 0, failed: 0 };
   if (patients < 1) return ret;
@@ -52,11 +53,12 @@ export async function importLabResults(
 
 /**
  * Prefills database with some data from lab results api.
- * @param patients - how many patients to retrieve
  */
-export async function initializeLabResultsDataSet(patients = 10) {
+export async function initializeLabResultsDataSet() {
   //WARN: theoretically patients can have no lab results, but not in our current workflow
-  if ((await db.patient.count()) < 10) {
-    await importLabResults(patients, 3);
+  const existingPatients = await db.patient.count();
+
+  if (existingPatients < LAB_RESULTS_INITIAL_PATIENTS) {
+    await importLabResults(LAB_RESULTS_INITIAL_PATIENTS - existingPatients);
   }
 }
