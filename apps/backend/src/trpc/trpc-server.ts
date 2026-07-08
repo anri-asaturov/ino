@@ -2,7 +2,6 @@ import { initTRPC } from '@trpc/server';
 import z, { ZodError } from 'zod';
 import { setLogCtx } from '../helpers/logger.js';
 import { type TRPCContext } from './context.js';
-import { TRPCApiError } from './errors.js';
 
 function summarizeInput(input: unknown) {
   if (Array.isArray(input)) {
@@ -38,8 +37,7 @@ export const t = initTRPC.context<TRPCContext>().create({
         zodError:
           error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
             ? z.treeifyError(error.cause)
-            : null,
-        apiError: error instanceof TRPCApiError ? error.apiError : undefined
+            : null
       }
     };
   }

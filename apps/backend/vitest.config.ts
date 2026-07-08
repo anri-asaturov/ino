@@ -19,7 +19,8 @@ export default defineConfig({
         '.conductor/**'
       ]
     },
-    exclude: ['node_modules', 'dist', 'generated', '.conductor']
+    // integration tests need a running PostgreSQL server: `pnpm test:integration`
+    exclude: ['node_modules', 'dist', 'generated', '.conductor', '**/*.integration.test.ts']
   },
   resolve: {
     alias: {

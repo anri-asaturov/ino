@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "VITE_INO_ENV=local vite --clearScreen false",
-    "build": "tsc -b && vite build",
-    "test": "VITE_INO_ENV=local vitest run --dir vite-plugins"
+    "build": "tsc -b && vite build"
   },
   "dependencies": {
     "@ino/backend": "workspace:*",

@@ -4,7 +4,6 @@ import react from '@vitejs/plugin-react';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type UserConfig } from 'vite';
-import { generateVersion } from './vite-plugins/generateVersion';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // Keep plugin-react/OXC off built workspace package JS. With Vite 8, pnpm-linked
@@ -12,8 +11,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const reactPluginInclude = /\.tsx?$/;
 
 export default defineConfig(() => {
-  generateVersion();
-
   const isProduction = process.env.VITE_INO_ENV === 'production';
   const isLocal = process.env.VITE_INO_ENV === 'local';
 

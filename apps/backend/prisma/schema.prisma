@@ -59,5 +59,7 @@ model LabResult {
     updatedAt DateTime @updatedAt @map("updated_at")
 
     @@unique([patientId, date])
+    // serves the time series keyset pagination sort
+    @@index([date(sort: Desc), id])
     @@map("lab_results")
 }

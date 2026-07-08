@@ -4,7 +4,10 @@ import type { LabResultsDTO } from './lab-results-import/labResultsImportSchema.
 const dbMocks = vi.hoisted(() => ({
   transaction: vi.fn(),
   patientUpsert: vi.fn(),
-  labResultUpsert: vi.fn()
+  patientCount: vi.fn(),
+  patientDeleteMany: vi.fn(),
+  labResultUpsert: vi.fn(),
+  labResultDeleteMany: vi.fn()
 }));
 
 const logMocks = vi.hoisted(() => ({
@@ -29,7 +32,8 @@ vi.mock('../db.js', () => ({
   db: {
     $transaction: dbMocks.transaction,
     patient: {
-      upsert: dbMocks.patientUpsert
+      upsert: dbMocks.patientUpsert,
+      count: dbMocks.patientCount
     },
     labResult: {
       upsert: dbMocks.labResultUpsert
@@ -45,7 +49,11 @@ vi.mock('../helpers/logger.js', () => ({
 }));
 
 import { LabResultsImportError } from './lab-results-import/LabResultsImportError.js';
-import { importLabResults } from './labResultsImportService.js';
+import {
+  importLabResults,
+  initializeLabResultsDataSet,
+  resetLabResultsDataSet
+} from './labResultsImportService.js';
 
 const labResultsFixture = {
   client_id: 'b7e289cd',
@@ -73,7 +81,10 @@ describe('lab result import service', () => {
   beforeEach(() => {
     dbMocks.transaction.mockReset();
     dbMocks.patientUpsert.mockReset();
+    dbMocks.patientCount.mockReset();
+    dbMocks.patientDeleteMany.mockReset();
     dbMocks.labResultUpsert.mockReset();
+    dbMocks.labResultDeleteMany.mockReset();
     logMocks.info.mockReset();
     logMocks.error.mockReset();
     fetchMock.mockReset();
@@ -83,10 +94,12 @@ describe('lab result import service', () => {
     dbMocks.transaction.mockImplementation((callback) =>
       callback({
         patient: {
-          upsert: dbMocks.patientUpsert
+          upsert: dbMocks.patientUpsert,
+          deleteMany: dbMocks.patientDeleteMany
         },
         labResult: {
-          upsert: dbMocks.labResultUpsert
+          upsert: dbMocks.labResultUpsert,
+          deleteMany: dbMocks.labResultDeleteMany
         }
       })
     );
@@ -99,7 +112,7 @@ describe('lab result import service', () => {
   it('fetches, validates, and saves lab results from the mock API', async () => {
     fetchMock.mockResolvedValue(Response.json([labResultsFixture]));
 
-    await expect(importLabResults(1)).resolves.toEqual({ imported: 1, failed: 0 });
+    await expect(importLabResults(1)).resolves.toEqual({ imported: 1, failed: 0, empty: 0 });
 
     expect(fetchMock).toHaveBeenCalledWith('https://mock-api.test/data', {
       headers: {
@@ -140,31 +153,52 @@ describe('lab result import service', () => {
       })
     });
     expect(logMocks.info).toHaveBeenCalledWith(
-      { imported: 1, failed: 0 },
+      { imported: 1, failed: 0, empty: 0 },
       'Lab results import finished.'
     );
   });
 
-  it('retries empty lab result batches before counting them as successful no-ops', async () => {
+  it('retries empty lab result batches with a delay and reports them as empty', async () => {
     fetchMock.mockImplementation(async () => Response.json([]));
 
-    await expect(importLabResults(1)).resolves.toEqual({ imported: 1, failed: 0 });
+    await expect(importLabResults(1)).resolves.toEqual({ imported: 0, failed: 0, empty: 1 });
 
     expect(fetchMock).toHaveBeenCalledTimes(5);
     expect(sleepMock).toHaveBeenCalledTimes(4);
     expect(dbMocks.transaction).not.toHaveBeenCalled();
     expect(dbMocks.labResultUpsert).not.toHaveBeenCalled();
     expect(logMocks.info).toHaveBeenCalledWith(
-      { imported: 1, failed: 0 },
+      { imported: 0, failed: 0, empty: 1 },
       'Lab results import finished.'
     );
+  });
+
+  it('does not sleep when the first fetch returns data', async () => {
+    fetchMock.mockResolvedValue(Response.json([labResultsFixture]));
+
+    await expect(importLabResults(1)).resolves.toEqual({ imported: 1, failed: 0, empty: 0 });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(sleepMock).not.toHaveBeenCalled();
+  });
+
+  it('stops retrying as soon as a retry returns data', async () => {
+    fetchMock
+      .mockResolvedValueOnce(Response.json([]))
+      .mockResolvedValueOnce(Response.json([labResultsFixture]));
+
+    await expect(importLabResults(1)).resolves.toEqual({ imported: 1, failed: 0, empty: 0 });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(sleepMock).toHaveBeenCalledTimes(1);
+    expect(dbMocks.labResultUpsert).toHaveBeenCalledTimes(1);
   });
 
   it('counts failed imports when the mock API request fails', async () => {
     const error = new Error('network failure');
     fetchMock.mockRejectedValue(error);
 
-    await expect(importLabResults(1)).resolves.toEqual({ imported: 0, failed: 1 });
+    await expect(importLabResults(1)).resolves.toEqual({ imported: 0, failed: 1, empty: 0 });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(dbMocks.labResultUpsert).not.toHaveBeenCalled();
@@ -177,7 +211,7 @@ describe('lab result import service', () => {
       'Lab result import failed.'
     );
     expect(logMocks.info).toHaveBeenCalledWith(
-      { imported: 0, failed: 1 },
+      { imported: 0, failed: 1, empty: 0 },
       'Lab results import finished.'
     );
   });
@@ -187,13 +221,13 @@ describe('lab result import service', () => {
     fetchMock.mockResolvedValue(Response.json([labResultsFixture]));
     dbMocks.labResultUpsert.mockRejectedValue(error);
 
-    await expect(importLabResults(1)).resolves.toEqual({ imported: 0, failed: 1 });
+    await expect(importLabResults(1)).resolves.toEqual({ imported: 0, failed: 1, empty: 0 });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(dbMocks.labResultUpsert).toHaveBeenCalledTimes(1);
     expect(logMocks.error).toHaveBeenCalledWith(error, 'Lab result import failed.');
     expect(logMocks.info).toHaveBeenCalledWith(
-      { imported: 0, failed: 1 },
+      { imported: 0, failed: 1, empty: 0 },
       'Lab results import finished.'
     );
   });
@@ -210,14 +244,46 @@ describe('lab result import service', () => {
       return Response.json([labResultsFixture]);
     });
 
-    await expect(importLabResults(5, 2)).resolves.toEqual({ imported: 5, failed: 0 });
+    await expect(importLabResults(5, 2)).resolves.toEqual({ imported: 5, failed: 0, empty: 0 });
 
     expect(fetchMock).toHaveBeenCalledTimes(5);
     expect(dbMocks.labResultUpsert).toHaveBeenCalledTimes(5);
     expect(maxActiveFetches).toBe(2);
     expect(logMocks.info).toHaveBeenCalledWith(
-      { imported: 5, failed: 0 },
+      { imported: 5, failed: 0, empty: 0 },
       'Lab results import finished.'
+    );
+  });
+
+  it('initializes only the missing patients when the database is below the initial amount', async () => {
+    dbMocks.patientCount.mockResolvedValue(4);
+    fetchMock.mockImplementation(async () => Response.json([labResultsFixture]));
+
+    await initializeLabResultsDataSet();
+
+    expect(fetchMock).toHaveBeenCalledTimes(6);
+  });
+
+  it('skips initialization when the initial data set is already present', async () => {
+    dbMocks.patientCount.mockResolvedValue(10);
+
+    await initializeLabResultsDataSet();
+
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('reset empties the database and then re-imports the initial data set', async () => {
+    dbMocks.patientCount.mockResolvedValue(0);
+    fetchMock.mockImplementation(async () => Response.json([labResultsFixture]));
+
+    await resetLabResultsDataSet();
+
+    expect(dbMocks.labResultDeleteMany).toHaveBeenCalledTimes(1);
+    expect(dbMocks.patientDeleteMany).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(10);
+    // deletes must land before the re-import starts
+    expect(dbMocks.labResultDeleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+      fetchMock.mock.invocationCallOrder[0]!
     );
   });
 });

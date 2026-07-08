@@ -18,21 +18,18 @@ mobile/      - Expo React Native app (@ino/mobile)
 apps/
   backend/     - Fastify API server with tRPC (@ino/backend)
   web/         - Vite React web app (@ino/web)
-  shared/      - Shared utilities and types (@ino/shared)
-  client-shared/ - Shared client code (@ino/client-shared)
 ```
 
 ## Key Commands
 
 ```bash
 pnpm dev                    # Start backend + web dev servers
-pnpm build                  # Build shared, backend, web
+pnpm build                  # Build backend, web
 pnpm format                 # Format all files with Prettier
 pnpm test:build-all         # test if everything (except mobile) build
 pnpm back <cmd>             # Run command in backend (e.g., pnpm back dev)
 pnpm web <cmd>              # Run command in web
 cd mobile && pnpm <cmd>     # Run command in mobile (not in pnpm workspaces)
-pnpm shared <cmd>           # Run command in shared
 pnpm prisma generate        # Generate Prisma client
 pnpm prisma migrate dev     # Create/run migrations
 ```

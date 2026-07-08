@@ -21,7 +21,8 @@
     "debug": "pnpm prisma generate && PORT=3007 tsx watch --inspect src/index.ts",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "test:integration": "pnpm prisma generate && vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^2.1.4",

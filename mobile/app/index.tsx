@@ -449,8 +449,7 @@ function LabResultCardHeader({
         ) : null}
         {showPatientId ? (
           <Text style={styles.cardMeta}>
-            {meta ? `Born ${meta} - ` : ''}Gender {patient.gender} - Ethnicity{' '}
-            {patient.ethnicity}
+            {meta ? `Born ${meta} - ` : ''}Gender {patient.gender} - Ethnicity {patient.ethnicity}
           </Text>
         ) : meta ? (
           <Text style={styles.cardMeta}>{meta}</Text>
