@@ -24,7 +24,8 @@ services:
   - name: ino-api
     type: web
     runtime: node
-    plan: free
+    plan: standard
+    preDeployCommand: pnpm prisma migrate deploy
     buildCommand: corepack enable && pnpm i --frozen-lockfile && pnpm back build
     startCommand: node ./apps/backend/dist/src/index.js
     autoDeployTrigger: commit
@@ -43,5 +44,5 @@ services:
 databases:
   - name: ino-db
     databaseName: ino
-    plan: free
+    plan: basic-1gb
     postgresMajorVersion: '18'
