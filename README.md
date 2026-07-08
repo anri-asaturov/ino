@@ -4,8 +4,6 @@ A small full-stack app that imports time-series lab results for mock patients an
 
 **Live demo:** https://ino-web.onrender.com
 
-On startup the backend prefills PostgreSQL with lab results for 10 patients from the mock API. **add new data** imports a selectable number of additional patients, **reset** empties the database and re-imports the initial dataset. The table offers two views — a flat time series and results grouped by patient — both with cursor-based (keyset) pagination and virtualized infinite scrolling. Values outside general adult reference ranges are marked with a low/high indicator.
-
 ## Stack
 
 pnpm workspaces monorepo:
