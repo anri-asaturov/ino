@@ -13,6 +13,8 @@ const GROUPED_LAB_RESULTS_PAGE_LIMIT = 100;
 const LAB_RESULT_ROW_HEIGHT = 48;
 const LAB_RESULTS_SCROLL_END_PADDING = 96;
 const SCROLL_TO_TOP_THRESHOLD = LAB_RESULT_ROW_HEIGHT * 8;
+const TIME_SERIES_TABLE_MIN_WIDTH_CLASS = 'min-w-[1456px]';
+const GROUPED_TABLE_MIN_WIDTH_CLASS = 'min-w-[1008px]';
 const TIME_SERIES_GRID_CLASS =
   'grid grid-cols-[7rem_10rem_7rem_5rem_6rem_repeat(7,minmax(8rem,1fr))] items-center';
 const GROUPED_GRID_CLASS = 'grid grid-cols-[7rem_repeat(7,minmax(8rem,1fr))] items-center';
@@ -281,7 +283,11 @@ export function DashboardPage() {
           onScroll={handleLabResultsScroll}
         >
           <div
-            className={labResultsView === 'timeSeries' ? 'min-w-[1120px]' : 'min-w-[1008px]'}
+            className={
+              labResultsView === 'timeSeries'
+                ? TIME_SERIES_TABLE_MIN_WIDTH_CLASS
+                : GROUPED_TABLE_MIN_WIDTH_CLASS
+            }
             role="table"
             aria-rowcount={
               labResultsView === 'timeSeries' ? statsQuery.data?.labResults : undefined
